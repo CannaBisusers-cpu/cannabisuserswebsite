@@ -85,20 +85,48 @@ exports.handler = async (event) => {
       return { statusCode: 400, body: JSON.stringify({ error: 'missing or invalid type parameter' }) };
     }
 
-    // Prune old timestamps
+    // Prune old timestamps (in-memory fallback)
     const t = now();
     requestTimestamps = requestTimestamps.filter(ts => (t - ts) < RATE.windowMs);
 
-    // Serve from cache if present and not expired
-    const cached = CACHE.get(url);
-    if (cached && cached.expiry > t) {
-      return {
-        statusCode: 200,
-        headers: { 'X-Cache': 'HIT' },
-        body: JSON.stringify(cached.data)
-      };
+    // If Redis is configured, prefer Redis-backed cache + rate-limit
+    const redisHelper = require('./twitch.redis');
+    const useRedis = !!process.env.REDIS_URL && redisHelper.getRedis();
+
+    if (useRedis) {
+      // Try Redis cache
+      const cachedRedis = await redisHelper.getCached(url);
+      if (cachedRedis) {
+        return { statusCode: 200, headers: { 'X-Cache': 'HIT-REDIS' }, body: JSON.stringify(cachedRedis) };
+      }
+
+      // Rate limiting via Redis
+      const rlKey = `twitch:rl:${Math.floor(t / RATE.windowMs)}:${type}`;
+      const allowed = await redisHelper.allowRequest(rlKey, Math.floor(RATE.windowMs / 1000), RATE.max);
+      if (!allowed) {
+        // return stale if available
+        if (cachedRedis) {
+          return { statusCode: 200, headers: { 'X-Cache': 'HIT-REDIS', 'X-Rate-Limited': 'true' }, body: JSON.stringify(cachedRedis) };
+        }
+        return { statusCode: 429, body: JSON.stringify({ error: 'rate limited - try again later' }) };
+      }
+
+      // Request via fetch and cache to Redis
+      requestTimestamps.push(t);
+      const resp = await fetch(url, { headers });
+      const json = await resp.json();
+
+      if (resp.status >= 400) {
+        // try stale
+        if (cachedRedis) return { statusCode: 200, headers: { 'X-Cache': 'HIT-REDIS', 'X-Cache-Stale': 'true' }, body: JSON.stringify(cachedRedis) };
+        return { statusCode: resp.status, body: JSON.stringify(json) };
+      }
+
+      await redisHelper.setCached(url, json, cacheTTL);
+      return { statusCode: 200, headers: { 'X-Cache': 'MISS-REDIS' }, body: JSON.stringify(json) };
     }
 
+    // If no Redis, proceed with in-memory caching/rate-limiting
     // If rate limited, try to return cached stale entry; otherwise 429
     if (requestTimestamps.length >= RATE.max) {
       if (cached) {

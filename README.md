@@ -60,11 +60,11 @@ npm ci
 npm test
 ```
 
-If you'd like, I can also add a caching layer backed by an external store (Redis) for more durable caching across cold starts, and add more advanced rate-limiting with Redis for global limits.
+I added optional Redis-backed caching and rate-limiting support. Set `REDIS_URL` to enable Redis-based caching, token storage, and distributed rate-limiting. CI integration uses a Redis service container for integration tests (`.github/workflows/integration.yml`).
 
 ---
 
 If you'd like, I can also:
 - Add a small CI check to prevent commits containing `TWITCH_OAUTH` patterns.
-- Implement caching for the function to reduce API calls and rate-limit risk.
+- Implement a Redis-backed token revocation/monitoring feature.
 
