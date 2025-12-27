@@ -30,6 +30,13 @@ TWITCH_OAUTH=Bearer your_oauth_token_here
 
 ---
 
+## SEO improvements & sitemap 🔍
+
+- Added meta tags (title, description), Open Graph and Twitter Card tags in `index.html` for better social previews.
+- Added `robots.txt` at project root referencing `sitemap.xml`.
+- Added `scripts/generate-sitemap.js` and `npm run generate-sitemap` (and `npm run build`) to emit `public/sitemap.xml` during build/deploy.
+- Added a Lighthouse CI workflow `.github/workflows/lighthouse.yml` (daily + on push to `main`) to track SEO, performance and accessibility.
+
 ## CI & local safety checks 🔒
 I added a repository secret scanner and test workflow to help prevent accidental token commits and to run tests automatically.
 

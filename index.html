@@ -3,10 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cannabisusers • Twitch</title>
+  <title>CannabisUsers — VODs & Clips from Twitch</title>
+  <meta name="description" content="Browse CannabisUsers' Twitch VODs and clips. Embedded player, latest uploads, and top clips updated automatically." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://cannabisusers.netlify.app/" />
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="CannabisUsers — VODs & Clips from Twitch" />
+  <meta property="og:description" content="Browse CannabisUsers' Twitch VODs and clips. Embedded player and highlights." />
+  <meta property="og:image" content="https://cannabisusers.netlify.app/og.png" />
+  <meta property="og:url" content="https://cannabisusers.netlify.app/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="CannabisUsers — VODs & Clips from Twitch" />
+  <meta name="twitter:description" content="Browse CannabisUsers' Twitch VODs and clips. Embedded player and highlights." />
+  <meta name="twitter:image" content="https://cannabisusers.netlify.app/og.png" />
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://api.twitch.tv" crossorigin>
+  <link rel="preconnect" href="https://static.twitchcdn.net" crossorigin>
 
   <!-- Twitch Embed Script -->
   <script src="https://embed.twitch.tv/embed/v1.js"></script>
+
+  <!-- JSON-LD structured data -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "CannabisUsers",
+      "url": "https://cannabisusers.netlify.app",
+      "sameAs": ["https://www.twitch.tv/cannabisusers"]
+    }
+  </script>
 
   <style>
     :root {
@@ -136,6 +165,13 @@
   </main>
 
   <footer>© 2025 cannabisusers</footer>
+
+  <noscript>
+    <div class="card" style="margin:20px;">
+      <h2>Content summary</h2>
+      <p>This site features CannabisUsers' Twitch channel, recent VODs, and top clips. Visit <a href="https://www.twitch.tv/cannabisusers">their Twitch channel</a> to watch live.</p>
+    </div>
+  </noscript>
 
   <script>
     // Twitch Live Embed (client-side embed still safe)
