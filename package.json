@@ -1,0 +1,16 @@
+{
+  "name": "cannabisuserswebsite",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "jest --runInBand",
+    "scan-secrets": "node scripts/scan-secrets.js",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "glob": "^8.1.0",
+    "husky": "^8.0.0",
+    "jest": "^29.0.0",
+    "netlify": "^23.13.0"
+  }
+}
