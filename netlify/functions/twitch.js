@@ -90,7 +90,7 @@ exports.handler = async (event) => {
     requestTimestamps = requestTimestamps.filter(ts => (t - ts) < RATE.windowMs);
 
     // If Redis is configured, prefer Redis-backed cache + rate-limit
-    const redisHelper = require('./twitch-redis');
+    const redisHelper = require('../helpers/twitch-redis');
     const useRedis = !!process.env.REDIS_URL && redisHelper.getRedis();
 
     if (useRedis) {
