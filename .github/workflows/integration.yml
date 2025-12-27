@@ -1,0 +1,28 @@
+name: Integration Tests
+
+on:
+  pull_request:
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 2s --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install
+        run: npm ci
+      - name: Run integration tests
+        env:
+          REDIS_URL: redis://localhost:6379
+          TWITCH_CLIENT_ID: testid
+          TWITCH_CLIENT_SECRET: secret
+        run: npm run test:integration

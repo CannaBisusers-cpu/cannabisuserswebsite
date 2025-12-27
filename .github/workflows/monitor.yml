@@ -1,0 +1,44 @@
+name: Netlify + Twitch monitoring
+
+on:
+  schedule:
+    - cron: '0 8 * * *' # daily at 08:00 UTC
+  workflow_dispatch:
+
+jobs:
+  token-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install deps
+        run: npm ci
+      - name: Twitch token check
+        env:
+          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
+          TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
+          ALERT_WEBHOOK: ${{ secrets.ALERT_WEBHOOK }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/monitor/twitch-token-check.js
+
+  function-health:
+    runs-on: ubuntu-latest
+    needs: token-check
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install deps
+        run: npm ci
+      - name: Function health check
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          ALERT_WEBHOOK: ${{ secrets.ALERT_WEBHOOK }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/monitor/function-health-check.js
